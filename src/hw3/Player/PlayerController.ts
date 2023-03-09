@@ -24,7 +24,13 @@ import Dead from "./PlayerStates/Dead";
 export const PlayerAnimations = {
     IDLE: "IDLE",
     WALK: "WALK",
-    JUMP: "JUMP",
+    RUNNING_LEFT: "RUNNING_LEFT",
+    RUNNING_RIGHT: "RUNNING_RIGHT",
+    ATTACKING_LEFT: "ATTACKING_LEFT",
+    ATTACKING_RIGHT: "ATTACKING_RIGHT",
+    TAKING_DAMAGE: "TAKING_DAMAGE",
+    DYING: "DYING",
+    DEAD: "DEAD",
 } as const
 
 /**
@@ -67,6 +73,8 @@ export default class PlayerController extends StateMachineAI {
     // protected cannon: Sprite;
     protected weapon: PlayerWeapon;
 
+    protected dead: boolean;
+
     
     public initializeAI(owner: HW3AnimatedSprite, options: Record<string, any>){
         this.owner = owner;
@@ -89,6 +97,8 @@ export default class PlayerController extends StateMachineAI {
         
         // Start the player in the Idle state
         this.initialize(PlayerStates.IDLE);
+
+        this.dead = false;
     }
 
     /** 
@@ -108,9 +118,44 @@ export default class PlayerController extends StateMachineAI {
     public update(deltaT: number): void {
 		super.update(deltaT);
 
+        if (this.health === 0 && !this.dead) { 
+            this.dead = true;
+            this.changeState(PlayerStates.DEAD); 
+        }
+        if (this.owner.onGround && Input.isPressed(HW3Controls.MOVE_RIGHT)){
+            if(this.velocity.x === 0) {
+                this.owner.animation.playIfNotAlready("IDLE", true);
+            } else {
+                this.owner.animation.playIfNotAlready("RUNNING_RIGHT", true);
+            }
+        }
+
+        if (this.owner.onGround && Input.isPressed(HW3Controls.MOVE_LEFT)){
+            this.owner.invertX = true;
+            if(this.velocity.x === 0) {
+                this.owner.animation.playIfNotAlready("IDLE", true);
+            } else {
+                this.owner.animation.playIfNotAlready("RUNNING_RIGHT", true);
+            }
+        }
+
         // If the player hits the attack button and the weapon system isn't running, restart the system and fire!
         if (Input.isPressed(HW3Controls.ATTACK) && !this.weapon.isSystemRunning()) {
+            let direction = this.inputDir;
+            console.log(direction.x)
+            if(direction.x < 0) {
+                console.log("Attack left")
+                this.owner.animation.play("ATTACKING_LEFT", false);
+                // this.owner.invertX = true;
+                // this.owner.invertX = true;
+            } 
+            else {
+                console.log("Attack right")
+                this.owner.animation.play("ATTACKING_RIGHT", false);
+            }
             // Start the particle system at the player's current position
+            
+            console.log("FIREED")
             this.weapon.startSystem(500, 0, this.owner.position);
         }
 
@@ -135,6 +180,8 @@ export default class PlayerController extends StateMachineAI {
         // When the health changes, fire an event up to the scene.
         this.emitter.fireEvent(HW3Events.HEALTH_CHANGE, {curhp: this.health, maxhp: this.maxHealth});
         // If the health hit 0, change the state of the player
-        if (this.health === 0) { this.changeState(PlayerStates.DEAD); }
+        if (this.health === 0) {
+            this.changeState(PlayerStates.DEAD); 
+        }
     }
 }

@@ -3,6 +3,8 @@ import { PlayerStates } from "../PlayerController";
 import PlayerState from "./PlayerState";
 
 export default class Fall extends PlayerState {
+    tookDamage: boolean = false;
+    dying: boolean = false;
 
     onEnter(options: Record<string, any>): void {
         // If we're falling, the vertical velocity should be >= 0
@@ -13,8 +15,21 @@ export default class Fall extends PlayerState {
 
         // If the player hits the ground, start idling and check if we should take damage
         if (this.owner.onGround) {
-            this.parent.health -= Math.floor(this.parent.velocity.y / 200);
-            this.finished(PlayerStates.IDLE);
+            if(this.tookDamage == false && this.parent.velocity.y > 200) {
+                this.parent.health -= Math.floor(this.parent.velocity.y / 200);
+                if(this.parent.health <= 0) {
+                    this.dying = true;
+                    this.finished(PlayerStates.DEAD);
+                }
+                if(this.dying == false) {
+                    this.owner.animation.playIfNotAlready("TAKING_DAMAGE", false);
+                }
+                this.tookDamage = true;
+            }
+            if(this.owner.animation.isPlaying("TAKING_DAMAGE") == false) {
+                this.tookDamage = false;
+                this.finished(PlayerStates.IDLE);
+            }
         } 
         // Otherwise, keep moving
         else {

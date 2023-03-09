@@ -7,7 +7,6 @@ export default class Walk extends PlayerState {
 
 	onEnter(options: Record<string, any>): void {
 		this.parent.speed = this.parent.MIN_SPEED;
-        this.owner.animation.playIfNotAlready(PlayerAnimations.WALK);
 	}
 
 	update(deltaT: number): void {

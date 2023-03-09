@@ -18,6 +18,13 @@ export const HW3Events = {
     HEALTH_CHANGE: "HEALTH_CHANGE",
 
     // The event sent when the player dies. Gets sent after the player's death animation
-    PLAYER_DEAD: "PLAYER_DEAD"
+    PLAYER_DEAD: "PLAYER_DEAD",
+
+    /**
+     * The event that gets triggered when the player's weapon hits a tile
+     * 
+     * Has data: { position: Vec2, tile: Tile }
+     */
+    PARTICLE_HIT_TILE: "PARTICLE_HIT_TILE",
     
 } as const;

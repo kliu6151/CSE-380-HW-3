@@ -5,6 +5,8 @@ import RenderingManager from "../../Wolfie2D/Rendering/RenderingManager";
 import SceneManager from "../../Wolfie2D/Scene/SceneManager";
 import Viewport from "../../Wolfie2D/SceneGraph/Viewport";
 import HW4Level2 from "./HW3Level2";
+import { GameEventType } from "../../Wolfie2D/Events/GameEventType";
+
 
 /**
  * The first level for HW4 - should be the one with the grass and the clouds.
@@ -13,7 +15,7 @@ export default class Level1 extends HW3Level {
 
     public static readonly PLAYER_SPAWN = new Vec2(32, 32);
     public static readonly PLAYER_SPRITE_KEY = "PLAYER_SPRITE_KEY";
-    public static readonly PLAYER_SPRITE_PATH = "hw4_assets/spritesheets/Hero.json";
+    public static readonly PLAYER_SPRITE_PATH = "hw4_assets/spritesheets/Platypus.json";
 
     public static readonly TILEMAP_KEY = "LEVEL1";
     public static readonly TILEMAP_PATH = "hw4_assets/tilemaps/HW4Level1.json";
@@ -26,6 +28,9 @@ export default class Level1 extends HW3Level {
 
     public static readonly JUMP_AUDIO_KEY = "PLAYER_JUMP";
     public static readonly JUMP_AUDIO_PATH = "hw4_assets/sounds/jump.wav";
+
+    public static readonly DEATH_AUDIO_KEY = "PLAYER_DEATH";
+    public static readonly DEATH_AUDIO_PATH = "hw4_assets/sounds/death.wav";
 
     public static readonly TILE_DESTROYED_KEY = "TILE_DESTROYED";
     public static readonly TILE_DESTROYED_PATH = "hw4_assets/sounds/switch.wav";
@@ -49,6 +54,7 @@ export default class Level1 extends HW3Level {
         // Music and sound
         this.levelMusicKey = Level1.LEVEL_MUSIC_KEY
         this.jumpAudioKey = Level1.JUMP_AUDIO_KEY;
+        this.deathAudioKey = Level1.DEATH_AUDIO_KEY;
         this.tileDestroyedAudioKey = Level1.TILE_DESTROYED_KEY;
 
         // Level end size and position
@@ -67,6 +73,7 @@ export default class Level1 extends HW3Level {
         // Audio and music
         this.load.audio(this.levelMusicKey, Level1.LEVEL_MUSIC_PATH);
         this.load.audio(this.jumpAudioKey, Level1.JUMP_AUDIO_PATH);
+        this.load.audio(this.deathAudioKey, Level1.DEATH_AUDIO_PATH);
         this.load.audio(this.tileDestroyedAudioKey, Level1.TILE_DESTROYED_PATH);
     }
 
@@ -74,7 +81,15 @@ export default class Level1 extends HW3Level {
      * Unload resources for level 1
      */
     public unloadScene(): void {
-        // TODO decide which resources to keep/cull 
+        this.resourceManager.keepSpritesheet(this.playerSpriteKey);
+        this.resourceManager.keepAudio(this.jumpAudioKey);
+        this.resourceManager.keepAudio(this.deathAudioKey);
+        this.resourceManager.keepAudio(this.tileDestroyedAudioKey);
+        this.resourceManager.unloadAllResources();
+        
+        // TODO decide which resources to keep/cull
+        // this.unload.tilemap(this.tilemapKey);
+        // this.keepSpriteSheet(this.playerSpriteKey, Level1.PLAYER_SPRITE_PATH);
     }
 
     public startScene(): void {
