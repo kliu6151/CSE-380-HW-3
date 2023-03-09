@@ -222,8 +222,8 @@ export default abstract class HW3Level extends Scene {
                 for(let row = minIndex.y; row <= maxIndex.y; row++){
                     // If the tile is collideable -> check if this particle is colliding with the tile
                     if(tilemap.isTileCollidable(col, row) && this.particleHitTile(tilemap, particle, col, row)){
-                        console.log("in here")
                         this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: this.tileDestroyedAudioKey, loop: false, holdReference: false });
+                        tilemap.setTileAtRowCol(new Vec2(col,row),0)
                     }
                 }
             }
@@ -247,21 +247,14 @@ export default abstract class HW3Level extends Scene {
         // hi.forEach((value, key) => { console.log(key, value) });
         
         // console.log("HIIHIH: ", hi);
-        console.log(new Vec2(row, col))
         let tile = tilemap.getTileAtRowCol(new Vec2(row, col));
         
         let tileWorldPos = tilemap.getTileWorldPosition(tile);
-        console.log("TILEPOS: ", tileWorldPos)
-        let pos = tilemap.getColRowAt(new Vec2(row, col));
-        console.log("POS: ", pos)
-        console.log("PARTICLEPOS: ", particle.position)
-        
-        if (particle.position === pos) {
+        if (tileWorldPos !== undefined  && particle.collidedWithTilemap) {
             return true;
         } else {
             return false;
         }
-        return true;
     }
 
     /**
@@ -329,7 +322,7 @@ export default abstract class HW3Level extends Scene {
         // Add physics to the destructible layer of the tilemap
         this.destructable.addPhysics();
         this.destructable.setGroup(HW3PhysicsGroups.DESTRUCTABLE);
-        this.destructable.setTrigger(HW3PhysicsGroups.PLAYER_WEAPON, HW3Events.PARTICLE_HIT_TILE, null);
+        this.destructable.setTrigger(HW3PhysicsGroups.PLAYER_WEAPON, HW3Events.PARTICLE_HIT_TILE, HW3Events.PARTICLE_HIT_TILE);
         // console.log(this.walls.group, this.destructable.group);
     }
     /**
@@ -429,6 +422,11 @@ export default abstract class HW3Level extends Scene {
     protected initializeWeaponSystem(): void {
         this.playerWeaponSystem = new PlayerWeapon(50, Vec2.ZERO, 1000, 3, 0, 50);
         this.playerWeaponSystem.initializePool(this, HW3Layers.PRIMARY);
+        let particles = this.playerWeaponSystem.getPool();
+        for (let particle of particles) {
+            particle.setGroup(HW3PhysicsGroups.PLAYER_WEAPON);
+        }
+        console.log("Weapon system initialized!")
     }
     /**
      * Initializes the player, setting the player's initial position to the given position.

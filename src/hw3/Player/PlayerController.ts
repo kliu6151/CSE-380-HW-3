@@ -144,18 +144,14 @@ export default class PlayerController extends StateMachineAI {
             let direction = this.inputDir;
             console.log(direction.x)
             if(direction.x < 0) {
-                console.log("Attack left")
                 this.owner.animation.play("ATTACKING_LEFT", false);
                 // this.owner.invertX = true;
                 // this.owner.invertX = true;
             } 
             else {
-                console.log("Attack right")
                 this.owner.animation.play("ATTACKING_RIGHT", false);
             }
             // Start the particle system at the player's current position
-            
-            console.log("FIREED")
             this.weapon.startSystem(500, 0, this.owner.position);
         }
 

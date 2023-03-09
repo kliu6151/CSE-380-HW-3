@@ -16,20 +16,20 @@ import { HW3PhysicsGroups } from "../HW3PhysicsGroups";
  * be spawned at the player's position and fired in the direction of the mouse's position.
  */
 export default class PlayerWeapon extends ParticleSystem {
-
+    
         /** Initialize the pool of all particles, creating the assets in advance */
-        initializePool(scene: Scene, layer: string) {
-            for (let i = 0; i < this.particlePool.length; i++) {
-                this.particlePool[i] = <Particle>scene.add.graphic(GraphicType.PARTICLE, layer,
-                    { position: this.sourcePoint.clone(), size: this.particleSize.clone(), mass: this.particleMass });
-                this.particlePool[i].addPhysics();
-                this.particlePool[i].setGroup(HW3PhysicsGroups.PLAYER_WEAPON);
-                console.log(this.particlePool[i].group);
-                this.particlePool[i].isCollidable = false;
-                this.particlePool[i].visible = false;
-            }
-            console.log("Player weapon initialized");
-        }
+        // initializePool(scene: Scene, layer: string) {
+        //     for (let i = 0; i < this.particlePool.length; i++) {
+        //         this.particlePool[i] = <Particle>scene.add.graphic(GraphicType.PARTICLE, layer,
+        //             { position: this.sourcePoint.clone(), size: this.particleSize.clone(), mass: this.particleMass });
+        //         this.particlePool[i].addPhysics();
+        //         this.particlePool[i].setGroup(HW3PhysicsGroups.PLAYER_WEAPON);
+        //         // console.log(this.particlePool[i].group);
+        //         this.particlePool[i].isCollidable = false;
+        //         this.particlePool[i].visible = false;
+        //     }
+        //     console.log("Player weapon initialized");
+        // }
 
     public getPool(): Readonly<Array<Particle>> {
         return this.particlePool;
@@ -46,10 +46,11 @@ export default class PlayerWeapon extends ParticleSystem {
      */
     public setParticleAnimation(particle: Particle) {
 
+        const mousePos = Input.getGlobalMousePosition();
+        const playerPos = this.sourcePoint;
+        let direction = mousePos.sub(playerPos).normalize();
 
-        let direction = Input.getGlobalMousePosition().sub(this.sourcePoint).normalize();
-        // console.log("DIRECTION: ",direction);
-        particle.vel = direction.scale(RandUtils.randInt(50, 100)).add(RandUtils.randVec(direction.x - 100, direction.x + 100, direction.y - 32, direction.y + 32));
+        particle.vel = direction.scale(RandUtils.randInt(50, 100)).add(RandUtils.randVec(direction.x - 50, direction.x + 50, direction.y - 32, direction.y + 32));
 
         // Give the particle a random velocity.
         // particle.vel = RandUtils.randVec(100, 200, -32, 32);
