@@ -426,14 +426,14 @@ export default abstract class HW3Level extends Scene {
         for (let particle of particles) {
             particle.setGroup(HW3PhysicsGroups.PLAYER_WEAPON);
         }
-        console.log("Weapon system initialized!")
+        // console.log("Weapon system initialized!")
     }
     /**
      * Initializes the player, setting the player's initial position to the given position.
      * @param position the player's spawn position
      */
     protected initializePlayer(key: string): void {
-        if (this.playerWeaponSystem === undefined) {
+        if (this.playerWeaponSystem === undefined && this.playerWeaponSystem.isSystemRunning()) {
             throw new Error("Player weapon system must be initialized before initializing the player!");
         }
         if (this.playerSpawn === undefined) {
